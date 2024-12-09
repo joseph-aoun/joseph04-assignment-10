@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Image Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2em;
+        }
+        .search-form {
+            margin-bottom: 2em;
+        }
+        .results img {
+            max-width: 200px;
+            margin: 10px;
+        }
+        .result-item {
+            display: inline-block;
+            text-align: center;
+            margin: 1em;
+        }
+    </style>
+</head>
+<body>
+<h1>Image Search</h1>
+<form action="/search" method="post" enctype="multipart/form-data" class="search-form">
+    <label for="text_query">Text Query:</label>
+    <input type="text" name="text_query" id="text_query" value="{{ text_query if text_query else '' }}"/><br><br>
+
+    <label for="image_query">Image Query:</label>
+    <input type="file" name="image_query" id="image_query"/><br><br>
+
+    <label for="lambda">Weight (Text vs Image) [0.0 - 1.0]:</label>
+    <input type="number" name="lambda" id="lambda" step="0.1" min="0.0" max="1.0" value="{{ lam if lam else 1.0 }}"/><br><br>
+
+    <label for="use_pca">Use PCA-based Embeddings:</label>
+    <input type="checkbox" name="use_pca" id="use_pca" {% if use_pca %}checked{% endif %}/><br><br>
+
+    <label for="k_components">Number of PCA Components (if using PCA):</label>
+    <input type="number" name="k_components" id="k_components" value="{{ k_components if k_components else 100 }}"/><br><br>
+
+    <input type="submit" value="Search"/>
+</form>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+{% if results %}
+<h2>Results:</h2>
+<div class="results">
+    {% for item in results %}
+        <div class="result-item">
+            <img src="{{ url_for('static', filename='coco_images_resized/' ~ item[0]) }}" alt="{{ item[0] }}"/>
+            <p>{{ item[0] }}<br>Score: {{ item[1] }}</p>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+</body>
+</html>
